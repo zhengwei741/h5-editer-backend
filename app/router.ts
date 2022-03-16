@@ -6,4 +6,9 @@ export default (app: Application) => {
   router.get('/', controller.home.index);
 
   router.get('/test', controller.home.test);
+
+  router.get('/getData', controller.home.getData);
+
+  router.get('/getTemp', controller.home.getTemp);
+
 };
