@@ -28,20 +28,4 @@ export default class HomeController extends Controller {
       package: result.data,
     };
   }
-  public async getTemp() {
-    let str = '欢迎来到天天的世界！';
-    let arr = [{
-      name: '明明',
-      sex: '男',
-      age: '18'
-    }, {
-      name: '璇璇',
-      sex: '女',
-      age: '16'
-    }];
-    await this.ctx.render('home', {
-      arr,
-      str
-    })
-  }
 }

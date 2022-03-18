@@ -14,13 +14,16 @@ export default (appInfo: EggAppInfo) => {
   config.view = {
     root: [
       path.join(appInfo.baseDir, 'app/view'),
-      path.join(appInfo.baseDir, 'path/to/another'),
     ].join(','),
     mapping: {
       '.nj': 'nunjucks',
     },
     defaultExtension: '.nj'
   };
+
+  config.robot = {
+    ua: ['/aaa']
+  }
 
   // add your special config in here
   const bizConfig = {

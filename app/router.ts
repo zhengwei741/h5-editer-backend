@@ -9,6 +9,6 @@ export default (app: Application) => {
 
   router.get('/getData', controller.home.getData);
 
-  router.get('/getTemp', controller.home.getTemp);
+  router.get('/news', controller.news.list);
 
 };
