@@ -25,6 +25,11 @@ export default (appInfo: EggAppInfo) => {
     ua: ['/aaa']
   }
 
+  // mongoose
+  config.mongoose = {
+    url: process.env.MONGO_URL || 'mongodb://localhost:27017/admin',
+  };
+
   // add your special config in here
   const bizConfig = {
     sourceUrl: `https://github.com/eggjs/examples/tree/master/${appInfo.name}`,

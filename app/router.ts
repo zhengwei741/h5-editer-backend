@@ -11,4 +11,6 @@ export default (app: Application) => {
 
   router.get('/news', controller.news.list);
 
+  router.get('/userList', controller.user.getUserList);
+
 };
