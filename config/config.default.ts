@@ -21,13 +21,9 @@ export default (appInfo: EggAppInfo) => {
     defaultExtension: '.nj'
   };
 
-  config.robot = {
-    ua: ['/aaa']
-  }
-
   // mongoose
   config.mongoose = {
-    url: process.env.MONGO_URL || 'mongodb://localhost:27017/admin',
+    url: process.env.MONGO_URL || 'mongodb://localhost:27017/h5editer',
   };
 
   // add your special config in here

@@ -10,7 +10,7 @@ interface RespType {
 interface errorRespType {
   ctx: Context
   errorType: keyof(typeof userErrorMessage)
-  error: any
+  error?: any
 }
 
 export default {

@@ -3,14 +3,6 @@ import { Application } from 'egg';
 export default (app: Application) => {
   const { controller, router } = app;
 
-  router.get('/', controller.home.index);
-
-  router.get('/test', controller.home.test);
-
-  router.get('/getData', controller.home.getData);
-
-  router.get('/news', controller.news.list);
-
-  router.get('/userList', controller.user.getUserList);
-
+  router.post('/api/user/create', controller.user.createUserByEmail)
+  router.get('/api/user/:id', controller.user.showUser)
 };

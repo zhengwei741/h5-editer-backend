@@ -1,15 +1,23 @@
 import { Service } from 'egg';
+import { UserProps } from '../model/user'
 
 /**
  * User Service
  */
 export default class User extends Service {
-  /**
-   * sayHi to you
-   * @param name - your name
-   */
-  public async getUserList() {
-    console.log(this.ctx.model, 'this.ctx.model')
-    return await this.ctx.model.User.find({})
+  public async findUserById(id: string) {
+    return await this.ctx.model.User.findById(id)
+  }
+  public async findUserByUsername(username: string) {
+    return await this.ctx.model.User.findOne({ username })
+  }
+  public async createUserByEmail(payload: UserProps) {
+    const { username, password } = payload
+    const userData : Partial<UserProps> = {
+      password,
+      username,
+      email: username
+    }
+    return await this.ctx.model.User.create(userData)
   }
 }
