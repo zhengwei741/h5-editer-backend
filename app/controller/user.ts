@@ -27,6 +27,7 @@ export default class UserController extends Controller {
       return ctx.helper.error({ ctx,  errorType: 'createUserValidataFail' ,error: errors })
     }
 
+    // 校验重复
     const user = await ctx.service.user.findUserByUsername(body.username)
     if (user) {
       return ctx.helper.error({ ctx,  errorType: 'createUserExist' })
