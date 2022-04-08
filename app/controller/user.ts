@@ -13,6 +13,10 @@ export const userErrorMessage = {
     errno: '0101003',
     message: '用户不存在或者账号密码错误'
   },
+  usertimeOut: {
+    errno: '0101004',
+    message: '用户过期'
+  },
 }
 
 export const userCareateRules = {
@@ -43,14 +47,51 @@ export default class UserController extends Controller {
     return ctx.helper.success({ ctx, res: userData })
   }
 
+  getToken() {
+    const { ctx } = this
+    const { authorization } = this.ctx.header
+    if (!ctx.header || !authorization) {
+      return false
+    }
+    if (typeof authorization === 'string') {
+      const parts = authorization.split(" ")
+      if (parts.length === 2) {
+        const scheme = parts[0]
+        const credentials = parts[1]
+        if (/^Bearer$/i.test(scheme)) {
+          return credentials
+        }
+      } else {
+        return false
+      }
+    }
+    return false
+  }
+
   public async showUser() {
-    const ctx = this.ctx
-    const userData = await ctx.service.user.findUserById(ctx.params.id)
-    return ctx.helper.success({ ctx, res: userData })
+    const { ctx, app } = this
+
+    const token = this.getToken()
+
+    if (!token) {
+      return ctx.helper.error({ ctx, errorType: 'usertimeOut' })
+    }
+
+    try {
+      const userInfo = app.jwt.verify(token, app.config.jwt.secret)
+      if (typeof userInfo === 'object') {
+        const { username } = userInfo
+        const userData = await ctx.service.user.findUserByUsername(username)
+        return ctx.helper.success({ ctx, res: userData })
+      }
+      return ctx.helper.error({ ctx, errorType: 'usertimeOut' })
+    } catch (e) {
+      return ctx.helper.error({ ctx, errorType: 'usertimeOut' })
+    }
   }
 
   public async loginUserByEmail() {
-    const { ctx } = this
+    const { ctx, app } = this
     const { email, password } = ctx.request.body
 
     const user = await ctx.service.user.findUserByEmail(email)
@@ -62,6 +103,13 @@ export default class UserController extends Controller {
     if (!verifyPwd) {
       return ctx.helper.error({ ctx, errorType: 'userloginError' })
     }
-    ctx.helper.success({ ctx, message: '登录成功', res: user.toJSON() })
+
+    const token = app.jwt.sign(
+      { username: user.username, id: user._id },
+      app.config.jwt.secret,
+      { expiresIn: app.config.jwtExpires }
+    )
+
+    ctx.helper.success({ ctx, message: '登录成功', res: token })
   }
 }

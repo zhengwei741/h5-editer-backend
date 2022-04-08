@@ -30,9 +30,14 @@ export default (appInfo: EggAppInfo) => {
     saltRounds: 10
   }
 
+  config.jwt = {
+    secret: '1234567890'
+  }
+
   // add your special config in here
   const bizConfig = {
     sourceUrl: `https://github.com/eggjs/examples/tree/master/${appInfo.name}`,
+    jwtExpires: '1h'
   };
 
   // the return config will combines to EggAppConfig
