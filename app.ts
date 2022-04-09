@@ -34,5 +34,7 @@ export default class AppBoot implements IBoot {
 
   async willReady() { }
 
-  async didReady() { }
+  async didReady() {
+    console.log(this.app.middleware)
+  }
 }
