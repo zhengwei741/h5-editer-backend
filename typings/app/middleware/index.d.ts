@@ -2,10 +2,12 @@
 // Do not modify this file!!!!!!!!!
 
 import 'egg';
+import ExportCustomizeError from '../../../app/middleware/customizeError';
 import ExportNotfoundHandler from '../../../app/middleware/notfound_handler';
 
 declare module 'egg' {
   interface IMiddleware {
+    customizeError: typeof ExportCustomizeError;
     notfoundHandler: typeof ExportNotfoundHandler;
   }
 }

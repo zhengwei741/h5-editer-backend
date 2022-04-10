@@ -1,4 +1,6 @@
 import { IBoot, Application } from 'egg'
+import * as dotenv from 'dotenv'
+dotenv.config()
 
 export default class AppBoot implements IBoot {
   app: Application
@@ -24,17 +26,17 @@ export default class AppBoot implements IBoot {
     //     delete app.sessionMap[key]
     //   },
     // }
-    console.log('configWillLoad')
-    console.log(app)
+    // console.log('configWillLoad')
+    // console.log(app)
   }
 
   configWillLoad() {
-    console.log('configWillLoad')
+    // console.log('configWillLoad')
   }
 
   async willReady() { }
 
   async didReady() {
-    console.log(this.app.middleware)
+    // console.log(this.app.middleware)
   }
 }

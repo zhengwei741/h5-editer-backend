@@ -15,7 +15,23 @@ export const userErrorMessage = {
   },
   usertimeOut: {
     errno: '0101004',
-    message: '用户过期'
+    message: '登录过期'
+  },
+  verifyCodeStillValid: {
+    errno: '0101005',
+    message: '验证码还在有效期内'
+  },
+  sendVerifyCodeFail: {
+    errno: '0101006',
+    message: '发送验证码失败'
+  },
+  loginVeriCodeIncorrectFailInfo: {
+    errno: '0101007',
+    message: '验证码错误'
+  },
+  universalError: {
+    errno: '0101999',
+    message: '操作失败'
   },
 }
 
@@ -24,14 +40,19 @@ export const userCareateRules = {
   password: { type: 'password', min: 8 }
 }
 
+export const sendVerifyCodeRules = {
+  phoneNumber: { type: 'string', format: /^1(3\d|4[5-9]|5[0-35-9]|6[567]|7[0-8]|8\d|9[0-35-9])\d{8}$/, message: '手机号码格式错误' },
+  veriCode: { type: 'string', format: /^\d{4}$/, message: '验证码格式错误' }
+}
+
 export default class UserController extends Controller {
   public async createUserByEmail() {
     const { ctx, app } = this
 
     const body = ctx.request.body
     const errors = await app.validator.validate(userCareateRules, body)
-    ctx.logger.warn(errors)
     if (errors) {
+      ctx.logger.warn(errors)
       return ctx.helper.error({ ctx, errorType: 'userValidataFail', error: errors })
     }
 
@@ -69,25 +90,9 @@ export default class UserController extends Controller {
   }
 
   public async showUser() {
-    const { ctx, app } = this
-
-    const token = this.getToken()
-
-    if (!token) {
-      return ctx.helper.error({ ctx, errorType: 'usertimeOut' })
-    }
-
-    try {
-      const userInfo = app.jwt.verify(token, app.config.jwt.secret)
-      if (typeof userInfo === 'object') {
-        const { username } = userInfo
-        const userData = await ctx.service.user.findUserByUsername(username)
-        return ctx.helper.success({ ctx, res: userData })
-      }
-      return ctx.helper.error({ ctx, errorType: 'usertimeOut' })
-    } catch (e) {
-      return ctx.helper.error({ ctx, errorType: 'usertimeOut' })
-    }
+    const { ctx } = this
+    const userData = await ctx.service.user.findUserById(ctx.params.id)
+    return ctx.helper.success({ ctx, res: userData })
   }
 
   public async loginUserByEmail() {
@@ -111,5 +116,41 @@ export default class UserController extends Controller {
     )
 
     ctx.helper.success({ ctx, message: '登录成功', res: token })
+  }
+
+  public async loginUserByPhone() {
+    const { ctx, app } = this
+    // 校验手机号和验证码
+    const errors = await app.validator.validate(sendVerifyCodeRules, ctx.request.body)
+    if (errors) {
+      ctx.logger.warn(errors)
+      return ctx.helper.error({ ctx, errorType: 'universalError', error: errors })
+    }
+    const { phoneNumber, veriCode } = ctx.request.body
+    const preVeriCode = await app.redis.get(`verifyCode-${phoneNumber}`)
+    if (veriCode !== preVeriCode) {
+      return ctx.helper.error({ ctx, errorType: 'loginVeriCodeIncorrectFailInfo' })
+    }
+    const token = await ctx.service.user.loginUserByPhone(phoneNumber)
+    ctx.helper.success({ ctx, res: token })
+  }
+
+  public async sendVerifyCode() {
+    const { ctx, app } = this
+    const { phoneNumber } = ctx.request.body
+    // 验证码是否在有效期内
+    const preVeriCode = await app.redis.get(`verifyCode-${phoneNumber}`)
+    if (preVeriCode ) {
+      return ctx.helper.error({ ctx, errorType: 'verifyCodeStillValid' })
+    }
+    // 生成4位验证码
+    const verifyCode = (Math.floor(((Math.random() * 9000) + 1000))).toString()
+    // 存入redis
+    await app.redis.set(`verifyCode-${phoneNumber}`, verifyCode, 'ex', 60)
+
+    // TODO
+    // 对接阿里云短信服务
+
+    ctx.helper.success({ ctx, message: '验证码发送成功', res: app.config.env === 'local' ? { verifyCode } : null })
   }
 }

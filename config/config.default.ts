@@ -9,7 +9,7 @@ export default (appInfo: EggAppInfo) => {
   config.keys = appInfo.name + '_1647350632506_4512';
 
   // add your egg config in here
-  config.middleware = ['notfoundHandler'];
+  config.middleware = ['notfoundHandler', 'customizeError'];
 
   config.view = {
     root: [
@@ -31,7 +31,16 @@ export default (appInfo: EggAppInfo) => {
   }
 
   config.jwt = {
-    secret: '1234567890'
+    secret: process.env.JWT_SECRET
+  }
+
+  config.redis = {
+    client: {
+      port: 6379,
+      host: '127.0.0.1',
+      password: process.env.REDIS_PWD || '',
+      db: 0
+    }
   }
 
   // add your special config in here

@@ -10,6 +10,7 @@ export interface UserProps {
   phoneNumber: string
   createdAt?: Date
   updatedAt?: Date
+  type: 'email' | 'cellphone' | 'oauth'
 }
 
 const initUserModel = function (app: Application) {
@@ -20,11 +21,12 @@ const initUserModel = function (app: Application) {
 
   const userSchema = new Schema<UserProps>({
     username: { type: String, unique: true, required: true },
-    password: { type: String, required: true },
+    password: { type: String },
     email: { type: String },
     nickname: { type: String },
     picture: { type: String },
     phoneNumber: { type: String },
+    type: { type: String }
   }, {
     collection: 'user',
     // 自动添加更新createdAt updatedAt
