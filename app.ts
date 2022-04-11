@@ -1,6 +1,4 @@
 import { IBoot, Application } from 'egg'
-import * as dotenv from 'dotenv'
-dotenv.config()
 
 export default class AppBoot implements IBoot {
   app: Application

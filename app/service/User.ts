@@ -48,4 +48,7 @@ export default class User extends Service {
       { expiresIn: app.config.jwtExpires }
     )
   }
+  public async loginUserByGitee(code: string) {
+
+  }
 }

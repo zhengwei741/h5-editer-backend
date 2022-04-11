@@ -7,5 +7,5 @@ export default () => {
       enable: false,
     }
   }
-  return config;
+  return config
 };

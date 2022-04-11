@@ -1,5 +1,7 @@
 import { EggAppConfig, EggAppInfo, PowerPartial } from 'egg';
 const path = require('path')
+import * as dovenv from 'dotenv'
+dovenv.config()
 
 export default (appInfo: EggAppInfo) => {
   const config = {} as PowerPartial<EggAppConfig>;
@@ -42,11 +44,17 @@ export default (appInfo: EggAppInfo) => {
       db: 0
     }
   }
-
+  const giteeOauthConfig = {
+    clientID: process.env.GITEE_CLIENT_ID,
+    ClientSecret: process.env.GITEE_CLIENT_SECRET,
+    redirectURL: 'http://localhost:7001/api/users/passport/gitee/callback'
+  }
+  console.log(process.env.JWT_SECRET, 'process.env.GITEE_CLIENT_ID')
   // add your special config in here
   const bizConfig = {
     sourceUrl: `https://github.com/eggjs/examples/tree/master/${appInfo.name}`,
-    jwtExpires: '1h'
+    jwtExpires: '1h',
+    giteeOauthConfig
   };
 
   // the return config will combines to EggAppConfig

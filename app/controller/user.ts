@@ -68,26 +68,26 @@ export default class UserController extends Controller {
     return ctx.helper.success({ ctx, res: userData })
   }
 
-  getToken() {
-    const { ctx } = this
-    const { authorization } = this.ctx.header
-    if (!ctx.header || !authorization) {
-      return false
-    }
-    if (typeof authorization === 'string') {
-      const parts = authorization.split(" ")
-      if (parts.length === 2) {
-        const scheme = parts[0]
-        const credentials = parts[1]
-        if (/^Bearer$/i.test(scheme)) {
-          return credentials
-        }
-      } else {
-        return false
-      }
-    }
-    return false
-  }
+  // getToken() {
+  //   const { ctx } = this
+  //   const { authorization } = this.ctx.header
+  //   if (!ctx.header || !authorization) {
+  //     return false
+  //   }
+  //   if (typeof authorization === 'string') {
+  //     const parts = authorization.split(" ")
+  //     if (parts.length === 2) {
+  //       const scheme = parts[0]
+  //       const credentials = parts[1]
+  //       if (/^Bearer$/i.test(scheme)) {
+  //         return credentials
+  //       }
+  //     } else {
+  //       return false
+  //     }
+  //   }
+  //   return false
+  // }
 
   public async showUser() {
     const { ctx } = this
@@ -140,7 +140,7 @@ export default class UserController extends Controller {
     const { phoneNumber } = ctx.request.body
     // 验证码是否在有效期内
     const preVeriCode = await app.redis.get(`verifyCode-${phoneNumber}`)
-    if (preVeriCode ) {
+    if (preVeriCode) {
       return ctx.helper.error({ ctx, errorType: 'verifyCodeStillValid' })
     }
     // 生成4位验证码
@@ -152,5 +152,18 @@ export default class UserController extends Controller {
     // 对接阿里云短信服务
 
     ctx.helper.success({ ctx, message: '验证码发送成功', res: app.config.env === 'local' ? { verifyCode } : null })
+  }
+
+  public async oauth() {
+    const { ctx, app } = this
+    ctx.redirect(`https://gitee.com/oauth/authorize?client_id=${app.config.giteeOauthConfig.clientID}&redirect_uri=${app.config.giteeOauthConfig.redirectURL}&response_type=code`)
+  }
+
+  public async oauthByGitee() {
+    const { ctx } = this
+    const code = ctx.query.code
+    if (code) {
+      ctx.service.user.loginUserByGitee(code)
+    }
   }
 }
