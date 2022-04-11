@@ -48,7 +48,68 @@ export default class User extends Service {
       { expiresIn: app.config.jwtExpires }
     )
   }
+  async getAccessToken (code: string) {
+    const { ctx, app } = this
+    const { data } = await ctx.curl(
+      `https://gitee.com/oauth/token?grant_type=authorization_code`,
+      {
+        type: 'POST',
+        contentType: 'json',
+        dataType: 'json',
+        data: {
+          code,
+          client_id: app.config.giteeOauthConfig.clientID,
+          redirect_uri: app.config.giteeOauthConfig.redirectURL,
+          client_secret: app.config.giteeOauthConfig.clientSecret
+        }
+      }
+    )
+    return data.access_token
+  }
+  async getGiteeUserData (accesstoken: string) {
+    const { ctx } = this
+    const { data } = await ctx.curl(
+      `https://gitee.com/api/v5/user`,
+      {
+        type: 'GET',
+        dataType: 'json',
+        data: {
+          access_token: accesstoken
+        }
+      }
+    )
+    return data
+  }
   public async loginUserByGitee(code: string) {
+    const accesstoken = await this.getAccessToken(code)
+    // 获取Gitee信息
+    const { id, avatar_url, email } = await this.getGiteeUserData(accesstoken)
+    const { app } = this
+    // 校验是否已经注册
+    const existUser = await this.findUserByUsername(`Gitee${id}`)
+    if (existUser) {
+      const token = app.jwt.sign(
+        { username: existUser.username, id: existUser._id },
+        app.config.jwt.secret,
+        { expiresIn: app.config.jwtExpires }
+      )
+      return token
+    }
 
+    const userData: Partial<UserProps> = {
+      username: `Gitee${id}`,
+      email,
+      type: 'oauth',
+      provider: 'gitee',
+      picture: avatar_url
+    }
+
+    const nweUser = await this.ctx.model.User.create(userData)
+
+    return app.jwt.sign(
+      { username: nweUser.username, id: nweUser._id },
+      app.config.jwt.secret,
+      { expiresIn: app.config.jwtExpires }
+    )
   }
 }

@@ -1,0 +1,24 @@
+<html>
+  <head>
+    <title>授权成功</title>
+  </head>
+  <body>
+    <div>
+      授权成功
+      2秒后关闭
+    </div>
+  </body>
+  <script>
+    window.onload = function() {
+      const message = {
+        type: 'oauth-token',
+        token: '{{token}}'
+      }
+
+      setTimeout(() => {
+        window.opener.postMessage(message, 'http://localhost:8080')
+        window.close()
+      }, 2000)
+    }
+  </script>
+</html>

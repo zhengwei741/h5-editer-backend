@@ -29,6 +29,10 @@ export const userErrorMessage = {
     errno: '0101007',
     message: '验证码错误'
   },
+  giteeLoginError: {
+    errno: '0101008',
+    message: 'gitee授权失败'
+  },
   universalError: {
     errno: '0101999',
     message: '操作失败'
@@ -91,8 +95,8 @@ export default class UserController extends Controller {
 
   public async showUser() {
     const { ctx } = this
-    const userData = await ctx.service.user.findUserById(ctx.params.id)
-    return ctx.helper.success({ ctx, res: userData })
+    const user = await ctx.service.user.findUserByUsername(ctx.state.user.username as string)
+    return ctx.helper.success({ ctx, res:user })
   }
 
   public async loginUserByEmail() {
@@ -162,8 +166,11 @@ export default class UserController extends Controller {
   public async oauthByGitee() {
     const { ctx } = this
     const code = ctx.query.code
-    if (code) {
-      ctx.service.user.loginUserByGitee(code)
+    try {
+      const token = await ctx.service.user.loginUserByGitee(code)
+      await ctx.render('success.nj', { token })
+    } catch(e) {
+      ctx.helper.error({ ctx, errorType: 'giteeLoginError' })
     }
   }
 }

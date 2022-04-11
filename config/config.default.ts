@@ -44,12 +44,19 @@ export default (appInfo: EggAppInfo) => {
       db: 0
     }
   }
+
+  config.cors = {
+    origin: 'http://localhost:8080',
+    // all
+    allowMethods: ['GET', 'POST', 'PUT', 'OPTIONS']
+  }
+
   const giteeOauthConfig = {
     clientID: process.env.GITEE_CLIENT_ID,
-    ClientSecret: process.env.GITEE_CLIENT_SECRET,
+    clientSecret: process.env.GITEE_CLIENT_SECRET,
     redirectURL: 'http://localhost:7001/api/users/passport/gitee/callback'
   }
-  console.log(process.env.JWT_SECRET, 'process.env.GITEE_CLIENT_ID')
+
   // add your special config in here
   const bizConfig = {
     sourceUrl: `https://github.com/eggjs/examples/tree/master/${appInfo.name}`,

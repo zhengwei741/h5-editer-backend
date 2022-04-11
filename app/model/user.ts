@@ -11,6 +11,7 @@ export interface UserProps {
   createdAt?: Date
   updatedAt?: Date
   type: 'email' | 'cellphone' | 'oauth'
+  provider?: 'gitee'
 }
 
 const initUserModel = function (app: Application) {
@@ -26,7 +27,8 @@ const initUserModel = function (app: Application) {
     nickname: { type: String },
     picture: { type: String },
     phoneNumber: { type: String },
-    type: { type: String }
+    type: { type: String },
+    provider: { type: String },
   }, {
     collection: 'user',
     // 自动添加更新createdAt updatedAt
