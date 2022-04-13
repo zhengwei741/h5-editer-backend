@@ -14,5 +14,10 @@ export default (app: Application) => {
   router.get('/users/passport/gitee', controller.user.oauth)
   router.get('/users/passport/gitee/callback', controller.user.oauthByGitee)
 
-  router.post('/work/createWork', jwtMiddleware, controller.work.createWork)
+  router.post('/works', jwtMiddleware, controller.work.createWork)
+  router.post('/works/copyWork', jwtMiddleware, controller.work.copyWork)
+  router.get('/works/:id', jwtMiddleware, controller.work.findWorkById)
+  router.del('/works/:id', jwtMiddleware, controller.work.deleteWork)
+  router.post('/works/publish/:id', jwtMiddleware, controller.work.publishWork)
+  router.post('/works/publish-template/:id', jwtMiddleware, controller.work.publishTemplate)
 };

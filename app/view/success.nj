@@ -5,7 +5,6 @@
   <body>
     <div>
       授权成功
-      2秒后关闭
     </div>
   </body>
   <script>
@@ -14,11 +13,8 @@
         type: 'oauth-token',
         token: '{{token}}'
       }
-
-      setTimeout(() => {
-        window.opener.postMessage(message, 'http://localhost:8080')
-        window.close()
-      }, 2000)
+      window.opener.postMessage(message, 'http://localhost:8080')
+      window.close()
     }
   </script>
 </html>

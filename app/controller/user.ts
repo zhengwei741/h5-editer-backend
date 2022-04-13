@@ -75,7 +75,7 @@ export default class UserController extends Controller {
     }
 
     const token = app.jwt.sign(
-      { username: user.username, id: user._id },
+      { username: user.username, _id: user._id },
       app.config.jwt.secret,
       { expiresIn: app.config.jwtExpires }
     )
@@ -111,7 +111,7 @@ export default class UserController extends Controller {
     // 生成4位验证码
     const verifyCode = (Math.floor(((Math.random() * 9000) + 1000))).toString()
     // 存入redis
-    await app.redis.set(`verifyCode-${phoneNumber}`, verifyCode, 'ex', 60)
+    await app.redis.set(`verifyCode-${phoneNumber}`, verifyCode, 'ex', 600)
 
     // TODO
     // 对接阿里云短信服务

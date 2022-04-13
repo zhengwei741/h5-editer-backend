@@ -38,7 +38,10 @@ const initWorkModel = function (app: Application) {
     // 关联的表
     user: { type: Schema.Types.ObjectId, ref: 'User' },
     latestPublishAt: { type: Date },
-  }, { timestamps: true })
+  }, {
+    collection: 'work',
+    timestamps: true
+  })
   WorkSchema.plugin(AutoIncrement, { inc_field: 'id', id: 'works_id_counter' })
   return mongoose.model<WorkProps>('Work', WorkSchema)
 }
