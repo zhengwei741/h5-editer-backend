@@ -33,7 +33,8 @@
     "egg-validate": "^2.0.2",
     "egg-view-nunjucks": "^2.3.0",
     "moment": "^2.29.1",
-    "mongoose-sequence": "^5.3.1"
+    "mongoose-sequence": "^5.3.1",
+    "nanoid": "^3.3.2"
   },
   "devDependencies": {
     "@types/mocha": "^2.2.40",
