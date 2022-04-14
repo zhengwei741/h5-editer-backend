@@ -16,15 +16,14 @@ export default class WorkController extends Controller {
       ctx.helper.error({ ctx, errorType: 'workValidateFail', error: e })
     }
   }
-  @inputValidate(workCreateRules, 'workValidateFail')
   public async copyWork() {
     const { ctx } = this
     const { id } = ctx.request.body
     try {
       const res = await ctx.service.work.copyWork(parseInt(id))
       ctx.helper.success({ ctx, message: '操作成功', res })
-    } catch(e) {
-      ctx.helper.error({ ctx, errorType: 'universalError', error: e})
+    } catch (e) {
+      ctx.helper.error({ ctx, errorType: 'universalError', error: e })
     }
   }
 
@@ -41,8 +40,8 @@ export default class WorkController extends Controller {
     try {
       await ctx.model.Work.deleteOne({ id: parseInt(id) })
       ctx.helper.success({ ctx, message: '操作成功' })
-    } catch(e) {
-      ctx.helper.error({ ctx, errorType: 'universalError', error: e})
+    } catch (e) {
+      ctx.helper.error({ ctx, errorType: 'universalError', error: e })
     }
   }
 
@@ -52,8 +51,8 @@ export default class WorkController extends Controller {
     try {
       await ctx.model.Work.findOneAndUpdate({ id }, { isTemplate })
       ctx.helper.success({ ctx, message: '操作成功' })
-    } catch(e) {
-      ctx.helper.error({ ctx, errorType: 'universalError', error: e})
+    } catch (e) {
+      ctx.helper.error({ ctx, errorType: 'universalError', error: e })
     }
   }
 
@@ -64,4 +63,52 @@ export default class WorkController extends Controller {
   public async publishTemplate() {
     this.publish(false)
   }
+
+  public async myList() {
+    const { ctx } = this
+    const userId = ctx.state.user._id
+    const { pageSize, pageNumber } = ctx.query
+    const findCondition = {
+      user: userId
+    }
+    const condition: IndexCondition = {
+      populate: {
+        path: 'user',
+        select: 'username nickname picture'
+      },
+      select: 'id author copiedCount coverImg desc title user isHot createdAt',
+      find: findCondition,
+      ...(pageNumber && { pageNumber: parseInt(pageNumber) }),
+      ...(pageSize && { pageSize: parseInt(pageSize) })
+    }
+    const mylist = await ctx.service.work.getList(condition)
+    ctx.helper.success({ ctx, res: mylist })
+  }
+
+  public async templateList() {
+    const { ctx } = this
+    const { pageSize, pageNumber } = ctx.query
+    const findCondition = { isPublic: true, isTemplate: true }
+    const condition: IndexCondition = {
+      populate: {
+        path: 'user',
+        select: 'username nickname picture'
+      },
+      select: 'id author copiedCount coverImg desc title user isHot createdAt',
+      find: findCondition,
+      ...(pageNumber && { pageNumber: parseInt(pageNumber) }),
+      ...(pageSize && { pageSize: parseInt(pageSize) })
+    }
+    const templateList = await ctx.service.work.getList(condition)
+    ctx.helper.success({ ctx, res: templateList })
+  }
+}
+
+export interface IndexCondition {
+  pageSize?: number
+  pageNumber?: number
+  select?: string | string[]
+  populate?: { path?: string, select?: string } | string
+  customSort?: Record<string, any>
+  find: Record<string, any>
 }

@@ -26,11 +26,12 @@ export default {
     }
   },
   error({ ctx, errorType, error }: errorRespType) {
-    const { errno, message } = globalErrorMessages[errorType]
+    const { message, errno } = globalErrorMessages[errorType]
     ctx.body = {
       errno,
       message,
       ...(error && { error })
     }
+    ctx.status = 200
   }
 }

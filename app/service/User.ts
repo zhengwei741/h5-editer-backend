@@ -36,8 +36,9 @@ export default class User extends Service {
       const userData: Partial<UserProps> = {
         username: phoneNumber,
         phoneNumber,
-        nickname: `${phoneNumber.slice(-4)}`,
-        type: 'cellphone'
+        nickName: `${phoneNumber.slice(-4)}`,
+        type: 'cellphone',
+        picture: ''
       }
       user = await this.ctx.model.User.create(userData)
     }
@@ -48,7 +49,7 @@ export default class User extends Service {
       { expiresIn: app.config.jwtExpires }
     )
   }
-  async getAccessToken (code: string) {
+  async getAccessToken(code: string) {
     const { ctx, app } = this
     const { data } = await ctx.curl(
       `https://gitee.com/oauth/token?grant_type=authorization_code`,
@@ -66,7 +67,7 @@ export default class User extends Service {
     )
     return data.access_token
   }
-  async getGiteeUserData (accesstoken: string) {
+  async getGiteeUserData(accesstoken: string) {
     const { ctx } = this
     const { data } = await ctx.curl(
       `https://gitee.com/api/v5/user`,

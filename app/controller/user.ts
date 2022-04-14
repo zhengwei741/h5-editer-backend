@@ -106,7 +106,7 @@ export default class UserController extends Controller {
     // 验证码是否在有效期内
     const preVeriCode = await app.redis.get(`verifyCode-${phoneNumber}`)
     if (preVeriCode) {
-      return ctx.helper.error({ ctx, errorType: 'verifyCodeStillValid' })
+      return ctx.helper.error({ ctx, errorType: 'verifyCodeStillValid', error: { preVeriCode } })
     }
     // 生成4位验证码
     const verifyCode = (Math.floor(((Math.random() * 9000) + 1000))).toString()

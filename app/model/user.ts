@@ -5,7 +5,7 @@ export interface UserProps {
   username: string
   password: string
   email?: string
-  nickname?: string
+  nickName?: string
   picture?: string
   phoneNumber: string
   createdAt?: Date
@@ -24,7 +24,7 @@ const initUserModel = function (app: Application) {
     username: { type: String, unique: true, required: true },
     password: { type: String },
     email: { type: String },
-    nickname: { type: String },
+    nickName: { type: String },
     picture: { type: String },
     phoneNumber: { type: String },
     type: { type: String },

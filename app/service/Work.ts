@@ -2,6 +2,16 @@ import { Service } from 'egg';
 import { WorkProps } from '../model/work'
 import { nanoid } from 'nanoid'
 import { Types } from 'mongoose'
+import { IndexCondition } from '../controller/work'
+
+const defaultIndexCondition: Required<IndexCondition> = {
+  pageSize: 0,
+  pageNumber: 10,
+  select: '',
+  populate: '',
+  customSort: {},
+  find: {}
+}
 
 /**
  * Work Service
@@ -47,5 +57,40 @@ export default class User extends Service {
       isTemplate: false
     }
     return this.ctx.model.Work.create(newWork)
+  }
+  async getList(condition: IndexCondition) {
+
+    const finallyCondition = {
+      ...defaultIndexCondition,
+      ...condition
+    }
+
+    const {
+      pageNumber,
+      pageSize,
+      select,
+      populate,
+      customSort,
+      find
+    } = finallyCondition
+
+    const skip = pageSize * pageNumber
+
+    const list = await this.ctx.model.Work
+      .find(find)
+      .populate(populate)
+      .sort(customSort)
+      .select(select)
+      .skip(skip)
+      .limit(pageSize)
+      .lean()
+
+    const count = await this.ctx.model.Work.find(find).count()
+    return {
+      pageNumber,
+      pageSize,
+      count,
+      list
+    }
   }
 }

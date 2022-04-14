@@ -20,4 +20,6 @@ export default (app: Application) => {
   router.del('/works/:id', jwtMiddleware, controller.work.deleteWork)
   router.post('/works/publish/:id', jwtMiddleware, controller.work.publishWork)
   router.post('/works/publish-template/:id', jwtMiddleware, controller.work.publishTemplate)
+  router.get('/myList', jwtMiddleware, controller.work.myList)
+  router.get('/templates', controller.work.templateList)
 };
