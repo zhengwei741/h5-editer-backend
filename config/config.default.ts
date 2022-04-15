@@ -1,5 +1,5 @@
 import { EggAppConfig, EggAppInfo, PowerPartial } from 'egg';
-const path = require('path')
+import { join } from 'path'
 import * as dovenv from 'dotenv'
 dovenv.config()
 
@@ -15,7 +15,7 @@ export default (appInfo: EggAppInfo) => {
 
   config.view = {
     root: [
-      path.join(appInfo.baseDir, 'app/view'),
+      join(appInfo.baseDir, 'app/view'),
     ].join(','),
     mapping: {
       '.nj': 'nunjucks',
@@ -49,6 +49,19 @@ export default (appInfo: EggAppInfo) => {
     origin: 'http://localhost:8080',
     // all
     allowMethods: ['GET', 'POST', 'PUT', 'OPTIONS']
+  }
+
+  config.multipart = {
+    whitelist: ['.png', '.jpg', '.gif', '.webp'],
+    fileSize: '1mb',
+    mode: 'file'
+  }
+
+  config.static = {
+    dir: [
+      { prefix: '/public', dir: join(appInfo.baseDir, 'app/public') },
+      { prefix: '/uploads', dir: join(appInfo.baseDir, 'uploads') }
+    ]
   }
 
   const giteeOauthConfig = {

@@ -1,5 +1,6 @@
 import { Controller } from 'egg'
 import inputValidate from '../decorator/inputValidate'
+import checkPermission from '../decorator/checkPermission'
 
 const workCreateRules = {
   title: 'string',
@@ -34,11 +35,13 @@ export default class WorkController extends Controller {
     ctx.helper.success({ ctx, res })
   }
 
+  @checkPermission('Work')
   public async deleteWork() {
     const { ctx } = this
-    const { id } = ctx.request.body
+    const { id } = ctx.params
+
     try {
-      await ctx.model.Work.deleteOne({ id: parseInt(id) })
+      await ctx.model.Work.deleteOne({ id })
       ctx.helper.success({ ctx, message: '操作成功' })
     } catch (e) {
       ctx.helper.error({ ctx, errorType: 'universalError', error: e })

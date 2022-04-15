@@ -22,4 +22,6 @@ export default (app: Application) => {
   router.post('/works/publish-template/:id', jwtMiddleware, controller.work.publishTemplate)
   router.get('/myList', jwtMiddleware, controller.work.myList)
   router.get('/templates', controller.work.templateList)
+
+  router.post('/upload', controller.upload.upload)
 };
