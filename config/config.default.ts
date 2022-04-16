@@ -51,12 +51,14 @@ export default (appInfo: EggAppInfo) => {
     allowMethods: ['GET', 'POST', 'PUT', 'OPTIONS']
   }
 
+  // 上传文件配置
   config.multipart = {
     whitelist: ['.png', '.jpg', '.gif', '.webp'],
     fileSize: '1mb',
-    mode: 'file'
+    // mode: 'file',
+    tmpdir: join(appInfo.baseDir, 'uploads')
   }
-
+  // 静态资源
   config.static = {
     dir: [
       { prefix: '/public', dir: join(appInfo.baseDir, 'app/public') },

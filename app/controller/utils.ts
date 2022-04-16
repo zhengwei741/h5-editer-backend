@@ -1,56 +1,38 @@
 import { Controller } from 'egg'
-import { createReadStream, createWriteStream } from 'fs'
-import { resolve } from 'path'
+import { createWriteStream } from 'fs'
+import { join } from 'path'
+import { pipeline } from 'stream/promises'
+import * as sharp from 'sharp'
+import { nanoid } from 'nanoid'
 
 export default class UploadController extends Controller {
   public async upload() {
-    const { ctx } = this
+    const { ctx, app } = this
 
-    const { filepath, filename } = ctx.request.files[0]
-    // readFile(filepath, (error, data) => {
-    //   if (error) {
-    //     return ctx.helper.success({ ctx, message: '上传失败' })
-    //   }
-    //   const p = resolve(__dirname, '../../', 'uploads', filename)
-    //   writeFile(p, data, (error) => {
-    //     if (error) {
-    //       return ctx.helper.success({ ctx, message: '写文件失败' })
-    //     }
-    //     ctx.helper.success({ ctx, message: '上传成功' })
-    //   })
-    // })
-    const source = createReadStream(filepath)
-    const p = resolve(__dirname, '../../', 'uploads', filename)
-    const target = createWriteStream(p)
+    const stream = await ctx.getFileStream()
+
+    const id = nanoid(6)
+
+    const filename = `${id}_${stream.filename}`
+
+    // 上传文件路径和文件流
+    const savedPath = join(app.config.baseDir, 'uploads', filename)
+    const writeStream = createWriteStream(savedPath)
+    const savePromise = pipeline(stream, writeStream)
+
+    // 缩略图文件路径和文件流
+    const thumbnailSavedPath = join(app.config.baseDir, 'uploads', `${filename}_thumbnail`)
+    const thumbnailWriteStream = createWriteStream(thumbnailSavedPath)
+    const transformer = sharp().resize({ width: 300 })
+    // 使用 pipeline
+    // pipe 每个管道需要监听error
+    const saveThumbnailPromise = pipeline(stream, transformer, thumbnailWriteStream)
 
     try {
-      // pump(source, target)
-      source.pipe(target)
-    } finally {
-      await ctx.cleanupRequestFiles()
+      await Promise.all([ savePromise, saveThumbnailPromise ])
+    } catch(e) {
+      return ctx.helper.error({ ctx, errorType: 'uploadImageFail', error: e })
     }
+    ctx.helper.success({ ctx, message: 'success' })
   }
 }
-
-// async function pump(source: ReadStream, target: WriteStream) {
-//   const getReadDate = async function () {
-//     return new Promise((resolve) => {
-//       let data = ''
-//       source.on('data', function (chunk) {
-//         data += chunk
-//       })
-//       source.on('end', function () {
-//         resolve(data)
-//       })
-//     })
-//   }
-//   const data = await getReadDate()
-
-//   return new Promise<void>((resolve) => {
-//     target.write(data)
-//     target.end()
-//     target.on('finish', function () {
-//       resolve()
-//     })
-//   })
-// }
