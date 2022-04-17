@@ -29,7 +29,10 @@ export default class AppBoot implements IBoot {
   }
 
   configWillLoad() {
+    // 此时 config 文件已经被读取并合并，但是还并未生效
+    // 这是应用层修改配置的最后时机
     // console.log('configWillLoad')
+    this.app.config.coreMiddleware.unshift('customizeError')
   }
 
   async willReady() { }

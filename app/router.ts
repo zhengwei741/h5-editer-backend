@@ -23,5 +23,5 @@ export default (app: Application) => {
   router.get('/myList', jwtMiddleware, controller.work.myList)
   router.get('/templates', controller.work.templateList)
 
-  router.post('/utils/upload-img', controller.utils.upload)
+  router.post('/utils/upload-img', controller.utils.uploadImageToAliOSS)
 };

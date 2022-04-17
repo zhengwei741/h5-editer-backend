@@ -11,7 +11,7 @@ export default (appInfo: EggAppInfo) => {
   config.keys = appInfo.name + '_1647350632506_4512';
 
   // add your egg config in here
-  config.middleware = ['notfoundHandler', 'customizeError'];
+  // config.middleware = ['notfoundHandler', 'customizeError'];
 
   config.view = {
     root: [
@@ -54,7 +54,7 @@ export default (appInfo: EggAppInfo) => {
   // 上传文件配置
   config.multipart = {
     whitelist: ['.png', '.jpg', '.gif', '.webp'],
-    fileSize: '1mb',
+    fileSize: '1kb',
     // mode: 'file',
     tmpdir: join(appInfo.baseDir, 'uploads')
   }
@@ -64,6 +64,16 @@ export default (appInfo: EggAppInfo) => {
       { prefix: '/public', dir: join(appInfo.baseDir, 'app/public') },
       { prefix: '/uploads', dir: join(appInfo.baseDir, 'uploads') }
     ]
+  }
+  // oss
+  config.oss = {
+    client: {
+      accessKeyId: process.env.ALI_ACCESSKEYID || '',
+      accessKeySecret: process.env.ALI_ACCESSKEYSECRET || '',
+      bucket: 'h5editer-backend',
+      endpoint: 'oss-cn-hangzhou.aliyuncs.com',
+      timeout: '60s',
+    }
   }
 
   const giteeOauthConfig = {
