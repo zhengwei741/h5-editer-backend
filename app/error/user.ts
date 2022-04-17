@@ -13,7 +13,7 @@ export default {
   },
   usertimeOut: {
     errno: '0101004',
-    message: '登录过期'
+    message: '未登录或者登录过期'
   },
   verifyCodeStillValid: {
     errno: '0101005',
