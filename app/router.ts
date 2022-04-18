@@ -23,4 +23,6 @@ export default (app: Application) => {
   router.get('/templates', controller.work.templateList)
 
   router.post('/utils/upload-img', controller.utils.uploadImageToAliOSS)
+
+  router.get('/rander-page/:id', controller.utils.randerH5Page)
 };

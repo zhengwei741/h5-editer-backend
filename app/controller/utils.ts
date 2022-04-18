@@ -31,8 +31,8 @@ export default class UploadController extends Controller {
     const saveThumbnailPromise = pipeline(stream, transformer, thumbnailWriteStream)
 
     try {
-      await Promise.all([ savePromise, saveThumbnailPromise ])
-    } catch(e) {
+      await Promise.all([savePromise, saveThumbnailPromise])
+    } catch (e) {
       // 删除文件
       await unlink(savedPath)
       await unlink(thumbnailSavedPath)
@@ -52,7 +52,7 @@ export default class UploadController extends Controller {
     try {
       const result = await ctx.oss.put(filename, stream)
       path = result.url
-    } catch(e) {
+    } catch (e) {
       await streamWormhole(stream)
       ctx.helper.error({ ctx, errorType: 'uploadImageFail', error: e })
     }
@@ -63,5 +63,16 @@ export default class UploadController extends Controller {
         path
       }
     })
+  }
+
+  public async randerH5Page() {
+    const { ctx } = this
+    const { id } = ctx.params
+    try {
+      const pageData = await ctx.service.utils.queryRanderPageData(id)
+      await ctx.render('page.nj', pageData)
+    } catch (e) {
+      ctx.helper.error({ ctx, errorType: 'renderPageFail', error: e })
+    }
   }
 }

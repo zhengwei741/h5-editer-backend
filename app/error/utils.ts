@@ -11,4 +11,8 @@ export default {
     errno: '0103003',
     message: '上传图片类型错误'
   },
+  renderPageFail: {
+    errno: '0103004',
+    message: '渲染页面出错'
+  },
 }
