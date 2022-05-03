@@ -8,7 +8,7 @@ export default class HomeController extends Controller {
   public async test() {
     const { ctx } = this;
     ctx.body = await ctx.service.test.say('word');
-    ctx.body = ctx.query
+    ctx.body = ctx.query;
   }
   public async getData() {
     const ctx = this.ctx;

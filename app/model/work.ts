@@ -2,6 +2,11 @@ import { Application } from 'egg'
 import * as AutoIncrementFactory from 'mongoose-sequence'
 import { ObjectId } from 'mongoose'
 
+export interface ChannelProps {
+  name: string,
+  id: string
+}
+
 export interface WorkProps {
   id?: number;
   uuid: string;
@@ -17,6 +22,7 @@ export interface WorkProps {
   status?: 0 | 1 | 2;
   user: ObjectId;
   latestPublishAt?: Date;
+  channels?: ChannelProps[];
 }
 
 const initWorkModel = function (app: Application) {
@@ -38,6 +44,7 @@ const initWorkModel = function (app: Application) {
     // 关联的表
     user: { type: Schema.Types.ObjectId, ref: 'User' },
     latestPublishAt: { type: Date },
+    channels: { type: Array }
   }, {
     collection: 'work',
     timestamps: true

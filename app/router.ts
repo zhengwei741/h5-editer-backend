@@ -20,9 +20,17 @@ export default (app: Application) => {
   router.post('/works/publish-template/:id', controller.work.publishTemplate)
   router.get('/works/myList', controller.work.myList)
 
+  router.post('/channels/createChannel', controller.work.createChannel)
+  router.get('/channels', controller.work.getChannels)
+  router.del('/channels/:id', controller.work.delChannel)
+  router.patch('/channels/updateChannel/:id', controller.work.updateChannel)
+  router.del('/channels/delChannel/:id', controller.work.delChannel)
+
   router.get('/templates', controller.work.templateList)
 
   router.post('/utils/upload-img', controller.utils.uploadImageToAliOSS)
 
   router.get('/rander-page/:id', controller.utils.randerH5Page)
+
+
 };

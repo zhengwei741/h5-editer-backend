@@ -7,8 +7,8 @@ export type GlobalErrorTypes = (
     typeof userErrorMessage &
     typeof workErrorMessage &
     typeof utilsErrorMessage
-    )
   )
+)
 
 export const globalErrorMessages = {
   ...userErrorMessage,

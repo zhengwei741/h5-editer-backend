@@ -28,8 +28,6 @@ export default class User extends Service {
     return this.ctx.model.User.findOne({ email })
   }
   public async loginUserByPhone(phoneNumber: string) {
-    const { app } = this
-
     let user = await this.findUserByPhoneNumber(phoneNumber)
 
     if (!user) {
@@ -43,11 +41,7 @@ export default class User extends Service {
       user = await this.ctx.model.User.create(userData)
     }
 
-    return app.jwt.sign(
-      { username: user.username, _id: user._id },
-      app.config.jwt.secret,
-      { expiresIn: app.config.jwtExpires }
-    )
+    return user
   }
   async getAccessToken(code: string) {
     const { ctx, app } = this
@@ -85,18 +79,11 @@ export default class User extends Service {
     const accesstoken = await this.getAccessToken(code)
     // 获取Gitee信息
     const { id, avatar_url, email } = await this.getGiteeUserData(accesstoken)
-    const { app } = this
     // 校验是否已经注册
     const existUser = await this.findUserByUsername(`Gitee${id}`)
     if (existUser) {
-      const token = app.jwt.sign(
-        { username: existUser.username, _id: existUser._id },
-        app.config.jwt.secret,
-        { expiresIn: app.config.jwtExpires }
-      )
-      return token
+      return existUser
     }
-
     const userData: Partial<UserProps> = {
       username: `Gitee${id}`,
       email,
@@ -104,13 +91,6 @@ export default class User extends Service {
       provider: 'gitee',
       picture: avatar_url
     }
-
-    const nweUser = await this.ctx.model.User.create(userData)
-
-    return app.jwt.sign(
-      { username: nweUser.username, _id: nweUser._id },
-      app.config.jwt.secret,
-      { expiresIn: app.config.jwtExpires }
-    )
+    return await this.ctx.model.User.create(userData)
   }
 }

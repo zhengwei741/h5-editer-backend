@@ -1,5 +1,5 @@
 import { Service } from 'egg';
-import { WorkProps } from '../model/work'
+import { WorkProps, ChannelProps } from '../model/work'
 import { nanoid } from 'nanoid'
 import { Types } from 'mongoose'
 import { IndexCondition } from '../controller/work'
@@ -29,6 +29,7 @@ export default class User extends Service {
     const uuid = nanoid(6)
     const newEmptyWork: Partial<WorkProps> = {
       ...payload,
+      // @ts-ignore
       user: Types.ObjectId(_id),
       uuid,
       author: username
@@ -54,7 +55,8 @@ export default class User extends Service {
       title: `${title}-复制`,
       desc,
       content,
-      isTemplate: false
+      isTemplate: false,
+      channels: []
     }
     return this.ctx.model.Work.create(newWork)
   }
@@ -78,6 +80,7 @@ export default class User extends Service {
 
     const list = await this.ctx.model.Work
       .find(find)
+      // @ts-ignore
       .populate(populate)
       .sort(customSort)
       .select(select)
@@ -92,5 +95,51 @@ export default class User extends Service {
       count,
       list
     }
+  }
+  async createChannel(name: string, workId: number) {
+    const { ctx } = this
+
+    const newChannel: ChannelProps = {
+      name,
+      id: nanoid(6)
+    }
+
+    return await ctx.model.Work.findOneAndUpdate({
+      id: workId
+    }, {
+      $push: {
+        channels: newChannel
+      }
+    })
+  }
+
+  async getChannels(workId: number) {
+    const work = await this.ctx.model.Work.findOne({
+      id: workId
+    })
+    if (work) {
+      return work.channels
+    }
+    return []
+  }
+
+  async updateChannel(id: number, name: string) {
+    return await this.ctx.model.Work.findOneAndUpdate({
+      "channels.id": id
+    }, {
+      $set: {
+        "channels.$.name": name
+      }
+    })
+  }
+
+  async delChannel(id: string) {
+    return await this.ctx.model.Work.findOneAndUpdate({
+      "channels.id": id
+    }, {
+      $pull: {
+        channels: { id }
+      }
+    })
   }
 }

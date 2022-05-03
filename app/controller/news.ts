@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 // app/controller/news.js
 const Controller = require('egg').Controller;
 
