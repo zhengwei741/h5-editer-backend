@@ -2,15 +2,25 @@ name: Greeting from Mona
 on: push
 
 jobs:
-  my-job:
-    name: My Job
+  deploy-and-restart:
+    name: get code
     runs-on: ubuntu-latest
     steps:
-    - name: Print a greeting
-      env:
-        MY_VAR: Hi there! My name is
-        FIRST_NAME: Mona
-        MIDDLE_NAME: The
-        LAST_NAME: Octocat
-      run: |
-        echo $MY_VAR $FIRST_NAME $MIDDLE_NAME $LAST_NAME.
+    # 1 拉代码
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        ref: Branch_testgitaction
+    # 使用阿里云ACR 完成 docker login
+    - name: Login to Aliyun Container Registry (ACR)
+      uses: aliyun/acr-login@v1
+      with:
+        login-server: https://registry.cn-shanghai.aliyuncs.com
+        region-id: cn-shanghai
+        username: "${{ secrets.ACR_USERNAME }}"
+        password: "${{ secrets.ACR_PASSWORD }}"
+    # 使用正确的阿里云 tag 进行 docker build
+    - name: Build image for Docker
+      run: docker build --tag "registry.cn-shanghai.aliyuncs.com/zhengwei741/h5editer:0.0.1" .
+    - name: Push Image to ACR
+      run: docker push registry.cn-shanghai.aliyuncs.com/zhengwei741/h5editer:0.0.1
